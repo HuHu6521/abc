@@ -1,1 +1,405 @@
-123
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMS库存中台管理系统 - 优化版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(90deg, #1a56db 0%, #0e2b6d 100%);
+            color: white;
+            padding: 24px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo::before {
+            content: "📊";
+            font-size: 32px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .date-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 80vh;
+        }
+        .sidebar {
+            background: #2d3748;
+            color: white;
+            padding: 24px 0;
+        }
+        .sidebar-section {
+            margin-bottom: 32px;
+        }
+        .sidebar-title {
+            padding: 8px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .sidebar-menu {
+            list-style: none;
+        }
+        .menu-item {
+            padding: 12px 24px 12px 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .menu-item.active {
+            background: #4a5568;
+            border-left: 4px solid #4299e1;
+        }
+        .sub-item {
+            padding: 10px 24px 10px 54px;
+            font-size: 14px;
+            color: #cbd5e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sub-item::before {
+            content: "→";
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        .content-area {
+            padding: 32px;
+            background: #f8fafc;
+        }
+        .module-group {
+            margin-bottom: 32px;
+        }
+        .group-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .group-title::before {
+            content: "";
+            width: 6px;
+            height: 24px;
+            background: #4299e1;
+            border-radius: 3px;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(66, 153, 225, 0.15);
+        }
+        .card-header {
+            padding: 18px 20px;
+            background: #f7fafc;
+            border-bottom: 1px solid #edf2f7;
+            font-weight: 600;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .feature-list {
+            list-style: none;
+        }
+        .feature-item {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        .feature-item::before {
+            content: "✔️";
+            color: #48bb78;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            padding: 15px 0;
+            background: #f0f7ff;
+            border-top: 1px solid #ebf8ff;
+        }
+        .stat-item {
+            padding: 8px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a56db;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 4px;
+        }
+        .highlight-card {
+            border: 2px solid #4299e1;
+            position: relative;
+        }
+        .highlight-card::after {
+            content: "热";
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: #e53e3e;
+            color: white;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 10px;
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">OMS库存中台管理系统</div>
+            <div class="user-info">
+                <div class="date-badge">2025年7月22日 星期二</div>
+                <div>管理员 | 库存中心</div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">核心业务模块</div>
+                    <ul class="sidebar-menu">
+                        <li class="menu-item active">
+                            <span>📦 库存管理</span>
+                        </li>
+                        <li class="menu-item">
+                            <span>📋 订单管理</span>
+                        </li>
+                        <li class="menu-item">
+                            <span>🔄 售后管理</span>
+                        </li>
+                        <li class="menu-item">
+                            <span>🏷️ 价格管理</span>
+                        </li>
+                        <li class="menu-item">
+                            <span>🌐 渠道管理</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="sidebar-section">
+                    <div class="sidebar-title">运营支持模块</div>
+                    <ul class="sidebar-menu">
+                        <li class="menu-item">
+                            <span>📱 直播管理</span>
+                        </li>
+                        <li class="menu-item">
+                            <span>⭐ 评价管理</span>
+                        </li>
+                        <li class="menu-item">
+                            <span>🔍 搜索管理</span>
+                        </li>
+                        <li class="menu-item">
+                            <span>🎯 营销管理</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <div class="module-group">
+                    <div class="group-title">库存核心功能</div>
+                    <div class="card-container">
+                        <div class="card highlight-card">
+                            <div class="card-header">📊 库存查询</div>
+                            <div class="card-body">
+                                <ul class="feature-list">
+                                    <li class="feature-item">网店库存查询</li>
+                                    <li class="feature-item">仓库库存查询</li>
+                                    <li class="feature-item">库存序列号查询</li>
+                                    <li class="feature-item">多维度库存分析</li>
+                                </ul>
+                            </div>
+                            <div class="stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">24</div>
+                                    <div class="stat-label">仓库数量</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">98%</div>
+                                    <div class="stat-label">库存准确率</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">🔄 库存变动管理</div>
+                            <div class="card-body">
+                                <ul class="feature-list">
+                                    <li class="feature-item">库存事务明细查询</li>
+                                    <li class="feature-item">实时变动追踪</li>
+                                    <li class="feature-item">库存调整单管理</li>
+                                    <li class="feature-item">操作日志审计</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">📦 预留库存管理</div>
+                            <div class="card-body">
+                                <ul class="feature-list">
+                                    <li class="feature-item">预留单设定</li>
+                                    <li class="feature-item">预留规则配置</li>
+                                    <li class="feature-item">预留释放管理</li>
+                                    <li class="feature-item">预留冲突预警</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="module-group">
+                    <div class="group-title">库存运营配置</div>
+                    <div class="card-container">
+                        <div class="card">
+                            <div class="card-header">🛒 网店活动库存</div>
+                            <div class="card-body">
+                                <ul class="feature-list">
+                                    <li class="feature-item">活动库存设置</li>
+                                    <li class="feature-item">预售库存管理</li>
+                                    <li class="feature-item">秒杀库存分配</li>
+                                    <li class="feature-item">活动库存预警</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">🏷️ 库存标签管理</div>
+                            <div class="card-body">
+                                <ul class="feature-list">
+                                    <li class="feature-item">文本标签管理</li>
+                                    <li class="feature-item">库存属性标记</li>
+                                    <li class="feature-item">批次标签管理</li>
+                                    <li class="feature-item">标签规则引擎</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">📑 库存核对报表</div>
+                            <div class="card-body">
+                                <ul class="feature-list">
+                                    <li class="feature-item">每日库存对账</li>
+                                    <li class="feature-item">差异分析报告</li>
+                                    <li class="feature-item">库存周转分析</li>
+                                    <li class="feature-item">呆滞库存预警</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="module-group">
+                    <div class="group-title">库存基础管理</div>
+                    <div class="card-container">
+                        <div class="card">
+                            <div class="card-header">📥 入库管理</div>
+                            <div class="card-body">
+                                <ul class="feature-list">
+                                    <li class="feature-item">入库单管理</li>
+                                    <li class="feature-item">采购入库</li>
+                                    <li class="feature-item">退货入库</li>
+                                    <li class="feature-item">调拨入库</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">📤 出库管理</div>
+                            <div class="card-body">
+                                <ul class="feature-list">
+                                    <li class="feature-item">销售出库</li>
+                                    <li class="feature-item">调拨出库</li>
+                                    <li class="feature-item">退货出库</li>
+                                    <li class="feature-item">损耗出库</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
